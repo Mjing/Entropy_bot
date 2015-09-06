@@ -1,2 +1,2 @@
 #!/bin/bash
-python -u myAI.py
+./a.out
