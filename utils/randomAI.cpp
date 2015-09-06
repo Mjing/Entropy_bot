@@ -71,40 +71,46 @@ int order(){
 	ordMove o;
 	for(int i=0;i<boardSize;i++){
 		for(int j=0;j<boardSize;j++){
-			pos1.x = i;
-			pos2.x = i+1;
-			pos1.y = j-1;
-			pos2.y = j;
-			o.s1 = pos1;
-			while(board[pos2.x][pos2.y] == '-' && pos1.x<boardSize){
-				pos2.x+=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
+			if(board[i][j]!='-'){
+				pos1.x = i;
+				pos2.x = i;
+				pos1.y = j;
+				pos2.y = j;
+				o.s1 = pos1;
+				while(pos2.x != boardSize -1){
+					pos2.x+=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+				}
+				pos2.x =i;
+				while(pos2.x != 0){
+					pos2.x-=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+				}
+				pos2.x =i;
+				while(pos2.y != 0){
+					pos2.y-=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+					if (pos2.y<0) return -10;
+				}
+				pos2.y=j;
+				while(pos2.y != boardSize){
+					pos2.y+=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+				}
+				pos2.y = j;
 			}
-			pos2.x = i-1;
-			while(board[pos2.x][pos2.y] == '-' && pos1.x>=0){
-				pos2.x-=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
-			}
-			pos2.x =i;
-			while(board[pos2.x][pos2.y] == '-'){
-				pos2.y-=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
-				if (pos2.y<0) return -10;
-			}
-			pos2.y=j+1;
-			while(board[pos2.x][pos2.y] != '-'){
-				pos2.y+=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
-			}
-			pos2.y = j;
 		}
 	}
 	if(s!=0){
@@ -151,6 +157,7 @@ void orderPlayer(){
 		//if (gameOver()) exit(-1);
 		updateOrder();
 		order();
+		updateChaos();
 	}
 }
 
