@@ -1,4 +1,5 @@
 # !/bin/bash
+#wtf man
 # script to start the server, which also starts the TA-AI client :P
 # TODO: Please make a utils folder and there may be libraries in common, I am high right now and maybe writing random comments, so please delete this comment afterwards... 
 
