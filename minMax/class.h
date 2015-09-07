@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <list>
 #include <vector>
+#define  ALPHA -100000
+#define BETA 100000
+
 using namespace std ;
 struct chip ;
 class gameTree ;
