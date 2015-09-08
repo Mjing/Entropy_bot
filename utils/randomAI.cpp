@@ -15,11 +15,6 @@ struct ordMove{
 	square s1,s2;
 };
 
-bool check(){
-	cout<<1;
-	return 1;
-}
-
 void printBoard(){
 	for(int i=0;i<boardSize;i++){
 		for(int j=0;j<boardSize;j++){
@@ -32,12 +27,11 @@ void printBoard(){
 }
 
 bool gameOver(){
-	cout<<1;
 	for(int i=0;i<boardSize;i++){
 		for(int j=0;j<boardSize;j++){
 			if(board[i][j] == '-'){
 				return false;
-				cout<<"done\n";
+				cerr<<"done\n";
 			}
 		}
 	}
@@ -49,6 +43,7 @@ void chaos(){
 	int s =0;
 	char color;
 	cin>>color;
+	cerr<<"my color is"<<color<<endl;
 	square pos;
 	for(int i=0;i<boardSize;i++){
 		for(int j=0;j<boardSize;j++){
@@ -61,6 +56,8 @@ void chaos(){
 		}
 	}
 	int idx = rand()%s;
+	cout<<moves->at(idx).x<<' '<<moves->at(idx).y<<endl;
+	board[moves->at(idx).x][moves->at(idx).y] = color;
 	cerr<<moves->at(idx).x<<' '<<moves->at(idx).y<<' '<<color<<endl;
 }
 
@@ -71,45 +68,53 @@ int order(){
 	ordMove o;
 	for(int i=0;i<boardSize;i++){
 		for(int j=0;j<boardSize;j++){
-			pos1.x = i;
-			pos2.x = i+1;
-			pos1.y = j-1;
-			pos2.y = j;
-			o.s1 = pos1;
-			while(board[pos2.x][pos2.y] == '-' && pos1.x<boardSize){
-				pos2.x+=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
+			if(board[i][j]!='-'){
+				pos1.x = i;
+				pos2.x = i;
+				pos1.y = j;
+				pos2.y = j;
+				o.s1 = pos1;
+				while(pos2.x != boardSize -1){
+					pos2.x+=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+				}
+				pos2.x =i;
+				while(pos2.x != 0){
+					pos2.x-=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+				}
+				pos2.x =i;
+				while(pos2.y != 0){
+					pos2.y-=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+					if (pos2.y<0) return -10;
+				}
+				pos2.y=j;
+				while(pos2.y != boardSize){
+					pos2.y+=1;
+					if(board[pos2.x][pos2.y]!='-') break;
+					o.s2 = pos2;
+					moves->push_back(o);
+					s+=1;
+				}
+				pos2.y = j;
 			}
-			pos2.x = i-1;
-			while(board[pos2.x][pos2.y] == '-' && pos1.x>=0){
-				pos2.x-=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
-			}
-			pos2.x =i;
-			while(board[pos2.x][pos2.y] == '-'){
-				pos2.y-=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
-				if (pos2.y<0) return -10;
-			}
-			pos2.y=j+1;
-			while(board[pos2.x][pos2.y] != '-'){
-				pos2.y+=1;
-				o.s2 = pos2;
-				moves->push_back(o);
-				s+=1;
-			}
-			pos2.y = j;
 		}
 	}
 	if(s!=0){
 		int idx = rand()%s;
-		cerr<<moves->at(idx).s1.x<<' '<<moves->at(idx).s1.y<<' '<<moves->at(idx).s2.x<<' '<<moves->at(idx).s2.y<<endl;
+		cout<<moves->at(idx).s1.x<<' '<<moves->at(idx).s1.y<<' '<<moves->at(idx).s2.x<<' '<<moves->at(idx).s2.y<<endl;
+		board[moves->at(idx).s2.x][moves->at(idx).s2.y] = board[moves->at(idx).s1.x][moves->at(idx).s1.y];
+		board[moves->at(idx).s1.x][moves->at(idx).s1.y] = '-';
 	}
 }
 
@@ -118,15 +123,7 @@ void updateChaos(){
 	cin>>x1>>y1>>x2>>y2;
 	board[x2][y2] = board[x1][y1];
 	board[x1][y1] = '-';
-}
-
-int updateOrder(){
-	int x1,y1;
-
-	char c;
-	cerr<<"Your move:  ";
-	cin>>x1>>y1>>c;
-	board[x1][y1] = c;
+	printBoard();
 }
 
 void chaosPlayer(){
@@ -136,6 +133,7 @@ void chaosPlayer(){
 			break;
 		}
 		if(run){
+			cerr<<"im here\n";
 			chaos();
 			run=0;
 		}
@@ -148,36 +146,33 @@ void chaosPlayer(){
 
 void orderPlayer(){
 	while(1){
-		//if (gameOver()) exit(-1);
-		updateOrder();
+		if (gameOver()){
+			break;
+		}
+		int x1,y1;
+		char c;
+		cin>>x1>>y1>>c;
+		board[x1][y1] = c;
 		order();
 	}
 }
 
 int main(){
+	srand(time(NULL));
 	cin>>boardSize;
-	//cerr<<"main is go\n"<<boardSize<<"   here\n";
 	board = new char* [boardSize];
 	for(int i=0;i<boardSize;i++){
 		board[i] = new char [boardSize];
 	}
-	//cerr<<"main is go\n";
 	for(int i=0;i<boardSize;i++){
 		for(int j=0;j<boardSize;j++){
 			board[i][j] = '-';
-			cout<<board[i][j];
-			cerr<<i*j<<"   you\n";
 		}
 	}
-	printBoard();
-	//cerr<<"main is go\n";
 	string role;
 	cin>>role;
-	//cerr<<"main is go\n"<<role<<'\n';
 	if (role == "ORDER"){
 		orderPlayer();
-		cout<<time(NULL)<<'\n';
-
 	}
 	else chaosPlayer();
 	return 0;
