@@ -1,11 +1,12 @@
-//attempt on evaluation function using the largest palindrom that the adde chip could use
+//attempt on evaluation function using the largest palindrome that the adde chip could use
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 
 char ** board;
 int boardSize;
 int * maxPalindromeLength;
-int* start,end;
+int* start, *end;
 int chips;
 
 char* preprocess(bool row,int idx){
@@ -55,9 +56,36 @@ int maxPalin(bool row,int idx,int cno){
     start[cno] = (cen-1-max)/2;
     end[cno] = (cen-1+max)/2;
   }
-  else){
+  else{
     start[cno+chips] = (cen-1-max)/2;
     end[cno+chips] = (cen-1+max)/2;
   }
   return max;
+}
+
+int main(){
+  cin>>boardSize;
+  //relaxman
+  chips = 0;
+  srand(time(NULL));
+  end = new int [boardSize];
+  start = new int [boardSize];
+  board = new char * [boardSize];
+  for (int i= 0;i<boardSize;i++){
+    board[i] = new char [boardSize];
+  }
+  char color [] = {'A','B','C','D','E','F','G'};
+  for(int i=0;i<boardSize;i++){
+    for(int j=0;j<boardSize;j++){
+      board[i][j] = color[rand()%boardSize];
+      cout<<board[i][j];
+      if(j!=boardSize-1){
+        cout<<" ";
+      }
+    }
+    cout<<'\n';
+  }
+  cout<<maxPalin(0,2,0)<<endl;
+  cout<<start[0]<<' '<<end[0]<<" here\n"<<endl;
+  return 0;
 }

@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
+// #include <stdio.h>
+// #include <stdlib.h>
 #include <stack>
 #include <math.h>
-// #include "class.cpp"
-// #include "phu.cpp"
+#include "class.cpp"
+//#include "phu.cpp"
 #define  ALPHA -100000
 #define BETA 100000
 
@@ -209,6 +209,6 @@ void dfs ()
 
 int main()
 {
-  start() ;
+  start(5) ;
   dfs() ;
 }
