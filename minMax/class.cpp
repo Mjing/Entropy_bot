@@ -7,7 +7,7 @@ struct chip
 } ;
 class gameTree
 {
-public:
+  public:
   //turn 0 - order 1 -chaos 2- expectation
   int turn ;
   int x1 , y1 , x2 , y2 , color , current ; float  score ;
@@ -63,7 +63,6 @@ public:
     switch(turn)
     {
       case 0 :
-
         for (list<chip>::iterator i = chipOnBoard.begin(); i !=chipOnBoard.end() ; i++)
         {
         bool left = true , right = true, up = true , down = true ;
@@ -83,6 +82,7 @@ public:
                 // chip temp ; temp.x = i->x - ind ; temp.y = i->y ;temp.color = currentState[temp.x][temp.y] ;
                 // chipOnBoard.push_back(temp ) ;
                 gameTree *temp = new gameTree (i->x , i->y , i->x-ind , i->y , currentState[i->x ][ i->y]) ;
+                temp->turn =2 ;
                 children.push_back(temp) ;
               }
               else left = false ;
@@ -92,6 +92,7 @@ public:
               if(currentState[i->x+ ind][i->y] ==-1 )
               {
                 gameTree *temp = new gameTree (i->x , i->y , i->x+ind , i->y , currentState[i->x ][ i->y]) ;
+                temp->turn =2 ;
                 children.push_back(temp) ;
               }
               else right = false ;
@@ -101,6 +102,7 @@ public:
               if(currentState[i->x][i->y- ind] ==-1 )
               {
                 gameTree *temp = new gameTree (i->x , i->y , i->x , i->y-ind , currentState[i->x ][ i->y]) ;
+                temp->turn =2 ;
                 children.push_back(temp) ;
               }
               else up = false ;
@@ -110,6 +112,7 @@ public:
               if(currentState[i->x][i->y+ ind] ==-1 )
               {
                 gameTree *temp = new gameTree (i->x , i->y , i->x , i->y+ind , currentState[i->x ][ i->y]) ;
+                temp->turn =2 ;
                 children.push_back(temp) ;
               }
               else down = false ;
@@ -117,31 +120,31 @@ public:
             ind++ ;
           }
         }
-
         break ;
+
       case 1 :
         for (size_t i = 0; i < boardSize; i++) {
           for (size_t j = 0; j < boardSize; j++) {
-            if(currentState[i][j] = -1)
+            if(currentState[i][j] == -1)
             {
-              gameTree temp (0) ;
-              temp.x1 = i ; temp.y1 = j ;temp.color = color ;
-              children.push_back(&temp) ;
+              gameTree* temp = new gameTree (0) ;
+              temp->x1 = i ; temp->y1 = j ;temp->color = color ;
+              children.push_back(temp) ;
             }
           }
         }
         break ;
+
       case 2:
         for(int i=0;i<boardSize;i++)
         {
-          gameTree temp (1);
-          temp.x1 = chips[i];
-          temp.y1 = boardSize*boardSize - chipOnBoard.size() ;
-          temp.color = i ;
-          children.push_back(&temp) ;
+          gameTree* temp = new gameTree (1);
+          temp->x1 = chips[i];
+          temp->y1 = boardSize*boardSize - chipOnBoard.size() ;
+          temp->color = i ;
+          children.push_back(temp) ;
         }
         break ;
-
     };
   }
 };
