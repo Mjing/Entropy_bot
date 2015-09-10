@@ -1,49 +1,31 @@
-<<<<<<< HEAD
 #include <stdio.h>
 #include <stdlib.h>
 #include <stack>
 #include <math.h>
-#include "class.cpp"
+#include "hash.cpp"
 // #include "phu.cpp"
-=======
-// #include <stdio.h>
-// #include <stdlib.h>
-#include <stack>
-#include <math.h>
-#include "class.cpp"
-//#include "phu.cpp"
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-#define  ALPHA -100000
-#define BETA 100000
 
 using namespace std ;
-
+long long thisState ;
+map <long long , float> safe ;
 stack <gameTree*> traversal ;
 int depth = 0  ;
-bool end = false;
-<<<<<<< HEAD
-void deleteAll(vector <gameTree*> a)
-{
-  for (size_t i = 0; i < a.size(); i++) {
-    delete a[i] ;
-  }
-}
+bool stop = false ;
+int nx1 , ny1 , nx2 , ny2 , turn;
 float evaluate ()
 {
-  return float (boardSize*boardSize - chipOnBoard.size() );
+  return float (noOfchips );
 }
-=======
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
 void start(int bs)
 {
   boardSize = bs ;
   currentState = new int*  [boardSize] ;
+  noOfchips = bs*bs ;
   chips = new int [boardSize];
   for(int i=0;i<boardSize;i++)
   {
     currentState[i] = new int [boardSize] ;
     chips [i] = boardSize;
-<<<<<<< HEAD
     for(int j =0;j<boardSize;j++)
     currentState[i][j] = -1 ;
   }
@@ -53,389 +35,292 @@ void start(int bs)
   //  rand()%boardSize ;
   gameTree* init = new gameTree  ;//intialise <<<<<<<----------
   init->x1 = rand() % boardSize;init->y1 = rand() % boardSize ;init->color =rand() % boardSize ;
-=======
-  }
-  int l1 = rand()%boardSize , l2 = rand()%boardSize ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
   for(int i=0;i<l1;i++)
     for(int j=0;j<l2;j++)
     {
       int x = rand()%boardSize , y = rand()%boardSize ;
-<<<<<<< HEAD
       if(init->x1 != x|| init->y1 != y)
       {
         int col = rand()%boardSize ;
         if(chips[col]>0)
         {currentState[x][y] = col ;
-        chip tdash ; tdash.x = x ; tdash.y= y ; tdash.color = currentState[x][y] ;
-        chipOnBoard.push_back(tdash) ;
         chips[currentState[x][y]]-- ;}}
     }
-  // printf("here\n");
-  currentState[init->x1][init->y1] = init->color ;init->turn = 0 ;
+  currentState[init->x1][init->y1] = init->color ;init->turn = 0 ;init->score = ALPHA ;
   chips[init->color] -- ;
-  chip tc ; tc.x = init->x1 ; tc.y = init->y1 ; tc.color= init->color ;
-  chipOnBoard.push_back(tc) ;
-  init->builChildren() ;
   traversal.push(init) ;
-  //printf("end%d\n" , traversal.top()->children.size());
+  turn = init->turn ;
 }
 void moveOrder(gameTree * a)
 {
   currentState[a->x1][a->y1] = -1 ;
   currentState[a->x2][a->y2] = a->color ;
-  chipOnBoard.pop_back() ;
-  chip temp ;
-  temp.x = a->x2 ;
-  temp.y = a->y2 ;
-  temp.color = a->color ;
-  chipOnBoard.push_back(temp) ;
 }
 void undoOrder (gameTree* a)
 {
   currentState[a->x1][a->y1] =-1 ;
   chips[a->color]++ ;
-  chipOnBoard.pop_back() ;
+  noOfchips ++ ;
 }
 void moveChaos (gameTree* a)
 {
-  chip temp;
-  temp.x = a->x1 ;
-  temp.y = a->y1 ;
-  temp.color = a->color ;
-  chips[a->color] -- ;
+  chips[a->color] -- ;noOfchips-- ;
   currentState[a->x1][a->y1] = a->color ;
-  chipOnBoard.push_back(temp) ;
 }
 void undoExp  (gameTree * a)
 {
-  chip temp ;
-  temp.x = a->x1 ;
-  temp.y = a->y1 ;
-  temp.color = a->color ;
-  chipOnBoard.pop_back() ;
-  chipOnBoard.push_back(temp) ;
   currentState[a->x2][a->y2] = -1 ;
   currentState[a->x1][a->y1] = a->color ;
 }
-=======
-      currentState[x] [y] = rand()%boardSize;
-      chip tdash ; tdash.x = x ; tdash.y= y ; tdash.color = currentState[x][y] ;
-      chipOnBoard.push_back(tdash) ;
-      chips[currentState[x][y]]-- ;
-    }
-  gameTree* init = new gameTree  ;//intialise <<<<<<<----------
-  init->x1 = rand() % boardSize ;init->y1 = rand() % boardSize ;init->color =rand() % boardSize ;
-  if(currentState[init->x1][init->y1] !=  -1) chips[currentState[init->x1][init->y1]] ++ ;
-  currentState[init->x1][init->y1] = init->color ;init->turn = 2 ;
-  init->builChildren() ;
-  traversal.push(init) ;
-}
 
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-//depth function
+//depth functionh
 //todo setscore & update globals
 //inv => for all (order) traversal.top-> score max(children) | traversal[1] min(all(traversal.top->score)) ;
 void order()
 {
-<<<<<<< HEAD
-  if (depth >= 5 )
+  // fprintf(stderr, "state %d %d %d %d\n",temps ->x1 , temps->y1 , temps->x2 , temps->y2 );
+  gameTree * temp  = traversal.top() ;
+  gameTree * temps = temp->nextState() ;
+  // printf("%d\n", temps->x1);
+  if(temps->x1 == -1)
   {
-    //traversal.top()->current ++ ;
-    gameTree * temp = traversal.top() ;
-    traversal.pop() ;
-    temp->score = evaluate() ;
-    undoOrder(temp) ;depth-- ;
-    if(traversal.top()->score > temp->score)
-    {
-      traversal.top()->score = temp->score ;
-    }
-    deleteAll(temp->children) ;
-    temp->children.clear() ;
-=======
-  if (depth >= 9 )
-  {
-    //traversal.top()->current ++ ;
-    (traversal.top())->score = evaluate() ;
-    gameTree * temp = traversal.top() ;
-    depth -- ;
-    currentState[temp->x1][temp->y1] = -1 ;
-    // currentState[temp->x1][temp->y1]= temp->color ;
-    chipOnBoard.pop_back() ;
-    traversal.pop() ;
-    if(temp->score  < traversal.top()->score)
-    {
-      traversal.top()->score = temp->score ;
-    }
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-    delete temp ;
-  }
-  else if(depth >0 && traversal.top()->current != -1 ){
-    gameTree * temp =traversal.top() ;
-    temp->current++ ;
-    traversal.pop() ;depth-- ;
-<<<<<<< HEAD
+    // if(depth == 0) fprintf(stderr, "yyyyyyyyy %d\n" , traversal.size());
     undoOrder(temp) ;
-=======
-    temp->color = currentState[temp->x1][temp->y1] ;
-    currentState[temp->x1][temp->y1] = -1 ;
-    chipOnBoard.pop_back() ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
+    traversal.pop() ;depth-- ;
+    if(depth >= 0)
+    {
+      if(temp->score < traversal.top()->score)
+      {
+        // fprintf(stderr, "qwe\n");
+        traversal.top()->score = temp->score ;
+        if( depth <2 && turn == 0 )
+        {
+          nx1  =temp->x1 ; ny1= temp->y1 ; nx2 = temp->color ;
+          printf("here\n" );
+        }
+      }
+      if(depth >=2 && depth <= 5)
+      {
+        //----------------------------------------------
+        safe.insert(std::pair<long long , float> (thisState  , temp->score)) ;
+      }
+
+    }
+    else stop = true ;
+    thisState= hashChaos (thisState,temp->x1 , temp->y1 , -1) ;
+    delete temp ; delete temps ;
+  }
+  else if(depth >= 8)
+  {
+    // if(depth == -) fprintf(stderr, "%s\n", "aaaaaaaaaaa");
+    traversal.pop() ;depth -- ;
+    // fprintf(stderr, "aa %d\n" , temps->x1);
+    moveOrder(temps) ;
+    temps->score = evaluate() ;
+    if(temps->score > temp->score) temp->score = temps->score ;
+    undoExp(temps) ;
+    if(temp->score < traversal.top()->score ) traversal.top()->score = temp->score ;
+    thisState= hashChaos(thisState , temp->x1 , temp->y1 , -1) ;
+    undoOrder(temp) ;
+    delete temp ; delete temps ;
+  }
+  else if (depth > 0 && temp->in)
+  {
+    // fprintf(stderr, "ad" );
+    // if(depth==0)fprintf(stderr, "xxxxxxxxxxxxxxxxxxxxxxxx %d\n" ,  traversal.size());
+    traversal.pop() ;depth-- ;
+    undoOrder(temp) ;
     if(temp->score < traversal.top()->score)
     {
       traversal.top()->score = temp->score ;
-      if(temp->current == temp->children.size())
+      moveChaos(temp) ;
+      traversal.push(temp) ;
+      depth ++ ;
+      bool prune = true ; long long sss = hashOrd(currentState , thisState , temps->x1 , temps->x2 , temps->y1 , temps->y2) ;
+      try {
+        temps->score = safe.at(sss) ;
+      }
+      catch(const std::out_of_range &error)
       {
-<<<<<<< HEAD
-        temp->children.clear() ;
-=======
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-        delete temp ;
+        prune = false ;
+      }
+      if(prune)
+      {
+        if(temps->score > temp->score) temp->score = temps->score ;
+        delete temps ;
       }
       else
       {
-<<<<<<< HEAD
-        moveChaos(temp) ;
-        traversal.push(temp) ;depth++ ;
-        moveOrder(temp->children[temp->current]) ;
-        if(depth < 5-1)
-          temp->children[temp->current]->builChildren() ;
-        traversal.push(temp->children[temp->current]) ;
-        depth++ ;
-=======
-        traversal.push(temp) ;depth++ ;
-        currentState[temp->x1][temp->y1] = temp->color
-        temp->children[temp->current]->builChildren() ;
-        currentState[traversal.top()->x1][traversal.top()->y1] = -1 ;
-        currentState[traversal.top()->x2][traversal.top()->y2] = temp.color ;
-        traversal.push(temp->children[temp->current]) ;depth++ ;
-        chip p ; p.x = traversal.top()->x2 ;p.y = traversal.top()->y2 ;
-        p.color = temp.color ;
-        chipOnBoard.push_back(p) ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
+        fprintf(stderr, "pruneD\n");
+        thisState = sss ;
+        moveOrder(temps) ;
+        traversal.push(temps) ;depth ++ ;
       }
     }
-    else
-    {
-<<<<<<< HEAD
-      fprintf(stderr, "prune\n" );
-      temp->children.clear() ;
-=======
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-      delete temp ;
-    }
+    else {thisState = hashChaos(thisState , temp->x1 , temp->y1 , -1) ;
+      delete temp ; delete temps ;}
   }
   else
   {
-    traversal.top()->current++ ;
-<<<<<<< HEAD
-    gameTree * temp = traversal.top()->children[traversal.top()->current] ;
-    moveOrder (temp) ;
-    depth++ ;
-    if(depth < 5) temp->builChildren() ;
-    traversal.push(temp) ;
-=======
-    int col = traversal.top()->color ;
-    traversal.push(traversal.top()->children[traversal.top()->current]) ;
-    currentState[traversal.top()->x1][traversal.top()->y1] = -1 ;
-    currentState[traversal.top()->x2][traversal.top()->y2] =col ;
-    depth++ ;
-    traversal.top()->builChildren() ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
+    // if(depth == 0) fprintf(stderr, "%s %d\n", "zzzzzzzzzzzzzzz" , traversal.size());
+    // fprintf(stderr, "ae" );
+    temp->in = true ;
+    // fprintf(stderr, "ac\n");
+    bool prune = true ;
+    long long sss = hashOrd(currentState , thisState , temps->x1, temps->x2 , temp->y1 , temps->y2) ;
+    try{
+      temps->score =  (safe.at(sss)) ;
+    }
+    catch(const std::out_of_range &error){
+      prune = false ;
+    }
+    if(prune)
+    {
+      delete temps ;
+      fprintf(stderr, "pruneA\n");
+    }
+    else {
+      moveOrder(temps) ;
+      thisState = sss ;
+      traversal.push(temps) ; depth++ ;
+    }
   }
 }
 //inv => for all (chaos) traversal.top-> score min(children) | traversal[1] exp(all(traversal.top->score)) ;
 void chaos()
 {
-<<<<<<< HEAD
-  //printf("chaos\n");
-  if(depth>= 5)
+  gameTree * temp = traversal.top();
+  gameTree* temps = temp->nextState() ;
+  // printf("%d\n", temps->x1);
+  if(temps->x1 == -1 )
   {
-    gameTree *temp = traversal.top() ; traversal.pop() ;
+    // fprintf(stderr, "ca\n");
+    traversal.pop() ;
+    if(depth > 0)
+    {
+      // printf("scoore %d\n", temp->x2);
+      traversal.top()->score += temp->score * (float (temp->x1) / float(temp->x2)) ;
+      if(depth>= 2 && depth <= 5)
+      {
+        safe.insert(std::pair<long,long> (thisState , temp->score ) ) ;
+      }
+    }
     depth-- ;
-    traversal.top()->score += temp->score * (float(temp->x1) / float(temp->y1)) ;
-    deleteAll(temp->children) ;
-    temp->children.clear() ;
-=======
-  if(depth>= 9)
+    delete temp ;delete temps ;
+  }
+  else if(depth >=8 )
   {
-    gameTree * temp = traversal.top() ;
     temp->score = evaluate() ;
     traversal.pop() ; depth-- ;
-    currentState[temp->x1][temp->y1] = -1 ;
-    chipOnBoard.pop_back() ;
-    chips[temp->color]++ ;
-    traversal.top()->score += float(color[temp->color])/float(boardSize*boardSize - chipOnBoard.size()) * (temp->score) ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-    delete temp ;
+    moveChaos (temps) ;
+    //thisState = hashChaos(thisState , temps->x1 , temp->y1 , temps->color) ;
+    temps->score = evaluate() ;
+    if(temps->score < temp->score) temp->score = temps->score ;
+    undoOrder(temps) ;
+    traversal.top()->score += temp->score * (float(temp->x1) / float(temp->x2)) ;
+    delete temp ; delete temps ;
   }
-  else if(depth>0 && traversal.top()->current != -1)
+  else if(depth > 0 && traversal.top()->in)
   {
-    gameTree * temp = traversal.top() ;
-    temp->current++ ;
-    traversal.pop() ; depth-- ;
-<<<<<<< HEAD
-    //printf("%d %d \n",temp->x1 , temp->y1);
-    traversal.top()->score += (float (temp->x1) / float(temp->y1))* (temp->score) ;
-    if(temp->current == temp->children.size())
-      {temp->children.clear() ;delete temp ;}
+    // fprintf(stderr, "cc\n" );
+    bool prune = true ; long long sss = hashChaos(thisState , temps->x1 , temps->y1 , temps->color) ;
+    try
+    {
+      temps->score = safe.at(sss) ;
+    }
+    catch(const std::out_of_range &error)
+    {
+      prune = false ;
+    }
+    if(prune) delete temps ;
     else
     {
-      //printf("chaos\n");
-      traversal.push(temp) ;depth++ ;
-      if(depth < 5)
-      temp->children[temp->current]->builChildren() ;
-      moveChaos(temp->children[temp->current]) ;
-=======
-    currentState[temp->x1][temp->y1] = -1 ;
-    chipOnBoard.push_back() ;
-    chips[temp->color]--;
-
-    int dd = boardSize * boardSize - chipOnBoard.size();
-    traversal.top() ->score += (float (color[temp->color]) / float(dd))* (temp->score) ;
-    if(temp->current == temp->children.size())
-      delete temp ;
-    else
-    {
-      traversal.push(temp) ;depth++ ;
-      currentState[temp->x1][temp->y1] = temp->color ;
-      chip tc ;tc.x = temp->x1 ;tc.y=temp->y1;tc.color = temp->color ;
-      chipOnBoard.push_back(tc) ;
-      chips[tc.color] -- ;
-      temp->children[temp->current]->builChildren() ;
-      currentState[traversal.top()->x1][traversal.top()->y1] = traversal.top()->color ;
-      chips[tc.color] -- ;
-      tc.x = traversal.top()->x1 ; tc.y = traversal.top().y1;tc.color = traversal.top()->color ;
-      chipOnBoard.push_back(tc) ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-      traversal.push(temp->children[temp->current]) ;depth++ ;
+      fprintf(stderr, "pruneC\n");
+      moveChaos(temps) ;thisState = sss ;
+      traversal.push(temps) ;depth++ ;
     }
   }
   else
   {
-    traversal.top()->current++ ;
-    traversal.push(traversal.top()->children[traversal.top()->current]) ;
-    depth++ ;
-<<<<<<< HEAD
-    if(depth < 5)
-    traversal.top()->builChildren() ;
-    moveChaos(traversal.top()) ;
+    // fprintf(stderr, "cd\n");
+    temp->in = true ;
+    bool prune = true ; long long sss = hashChaos(thisState , temps->x1 , temps->y1 , temps->color) ;
+    try
+    {
+      temps->score = safe.at(sss) ;
+    }
+    catch(const std::out_of_range &error)
+    {
+      prune = false ;
+    }
+    if(prune) delete temps ;
+    else {
+      fprintf(stderr, "pruneB\n");
+      thisState = sss ;
+      moveChaos(temps) ;
+      traversal.push(temps) ;depth++  ;
+    }
   }
   //printf("here1\n");
-=======
-    chip temp ; temp.x = traversal.top()->x1 ; temp.y = traversal.top()->y1 ;
-    temp.color = traversal.top()->color ;
-    currentState [temp.x][temp.y] = temp.color ;
-    chips[temp.color] -- ;
-    chipOnBoard.push_back(temp) ;
-    traversal.top()->builChildren() ;
-  }
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
 }
 //inv => for all (expi) traversal.top-> score exp(children) | traversal[1] max(all(traversal.top->score)) ;
 void exp()
 {
-<<<<<<< HEAD
-  if(depth >= 5)
+  gameTree * temp = traversal.top() ;
+  gameTree *temps = temp->nextState() ;
+  // printf("%d\n", temps->x1);
+  if(temps->x1 == -1)
   {
-    gameTree * temp = traversal.top() ;    depth -- ;
-    traversal.pop() ;
-    undoExp(temp) ;
-    if(traversal.top()->score < temp->score)
-    traversal.top()->score < temp->score ;
-    deleteAll(temp->children) ;
-    temp->children.clear() ;
-    delete temp ;
+    traversal.pop() ; depth -- ;
+    if(depth>= 0)
+      {
+        //fprintf(stderr, "wer\n");
+        if(traversal.top()->score < temp->score)
+        {
+          traversal.top()->score = temp->score ;
+          // fprintf(stderr, "bbbbbbbbb \n" );
+          if(turn == 0 && depth <2)
+          {
+            fprintf(stderr, "qwe1\n");
+            nx1 = temp->x1 ; nx2 = temp->x2 ; ny1 = temp->y1 ; ny2 = temp->y2 ;
+          }
+        }
+      }
+    delete temps ; delete temp ;
   }
-  else if(depth>0 && traversal.top()->current != -1)
+  else if (depth >=8 )
   {
-    gameTree *temp = traversal.top();
+    // traversal.pop() ; depth-- ;
     traversal.pop() ;depth-- ;
     undoExp(temp) ;
-    temp->current ++ ;
-    if(temp->current ==  temp->children.size())
-    {
-      if(temp->score > traversal.top()->score)
-      {
-        traversal.top()->score =temp->score  ;
-      }
-      temp->children.clear() ;
-      delete temp ;
-    }
-    else
-    {
-      traversal.push(temp) ;depth += 2;
-      if(depth < 5)
-      temp->children[temp->current]->builChildren() ;
-      traversal.push(temp->children[temp->current]) ;
-    }
+    delete temp ;delete temps ;
   }
-=======
-  if(depth>0 && traversal.top()->current != -1)
+  else if (temp-> in && depth>0)
   {
-    gameTree *temp = traversal.top();
-    traversal.pop() ;depth-- ;
-    temp->current ++ ;
-    if(temp->score > traversal.top())
-    {
-      traversal.top()->score =temp->score  ;
-      if(temp->current = temp->children.size())
-        delete temp ;
-      else
-      {
-        traversal.push(temp) ;depth += 2;
-        temp->children[temp->current]->builChildren() ;
-        traversal.push(temp->children[temp->current]) ;
-      }
-    }
-    else
-      delete temp ;
-    }
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-  else
-    {
-      traversal.top()->current++ ;
-      traversal.push(traversal.top()->children[traversal.top()->current]) ;
-      depth++ ;
-<<<<<<< HEAD
-      if(depth < 5)
-=======
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
-      traversal.top()->builChildren() ;
-    }
+    traversal.push(temps) ; depth++ ;
+  }
+  else {
+    temp->in = true ;
+    traversal.push(temps) ; depth++ ;
+  }
 }
 void dfs ()
 {
-<<<<<<< HEAD
-  while (1)
+  while (!stop)
   {
-    fprintf(stderr, "depth %d\n" , traversal.size() );
+    // fprintf(stderr, "depth %d\n" ,depth );
     // printf("end1 %d\n" , traversal.top()->children.size());
     // printf("inWhile %d\n",traversal.size() );
-    if((depth == 0)&&(traversal.top()->current== ((traversal.top())->children).size() - 1)) break ;
-    switch (traversal.top()->turn)
-    {
-
-      case 0 :
-        //fprintf(stderr, "order\n" );
-        order() ; break ;
-      case 1 :
-        //fprintf(stderr, "chaos\n" );
-        chaos() ; break ;
-      case 2 :
-        //fprintf(stderr, "exp\n");
-=======
-  while (!end)
-  {
-    if((depth == 0)&&(traversal.top()->current== ((traversal.top())->children).size())) break ;
     switch (traversal.top()->turn)
     {
       case 0 :
+        // fprintf(stderr, "order\n" );
         order() ; break ;
       case 1 :
+        // fprintf(stderr, "chaos\n" );
         chaos() ; break ;
       case 2 :
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
+        // fprintf(stderr, "exp\n");
         exp() ;break ;
     };
   }
@@ -443,10 +328,9 @@ void dfs ()
 
 int main()
 {
-<<<<<<< HEAD
-  start(7) ;
-=======
-  start(5) ;
->>>>>>> ab5e8d0799d3dc79282f00f67d6b34aa9dfb7ffc
+  start(7);
+  init_zobrist() ;
+  thisState = hashval(currentState) ;
   dfs() ;
+  fprintf(stderr, "move %d %d %d %d\n", nx1 , ny1 , nx2 , ny2);
 }
